@@ -3,8 +3,6 @@
 # Integrated Human Genome Analysis Pipeline
 ## Advanced Medical Bioinformatics Assignment
 
-### Course: Medical Bioinformatics (8000-level)
-### Duration: 4 weeks
 ### Total Points: 100
 
 ---
