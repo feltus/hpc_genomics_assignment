@@ -1,7 +1,6 @@
 # hpc_genomics_assignment
 
-# Integrated Human Genome Analysis Pipeline
-## Advanced Medical Bioinformatics Assignment
+# Programming Assignment:  Integrated Human Genome Analysis Pipeline
 
 ### Total Points: 100
 
