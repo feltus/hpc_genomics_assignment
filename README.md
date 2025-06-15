@@ -1,420 +1,507 @@
 # hpc_genomics_assignment
 
 # Integrated Human Genome Analysis Pipeline
-## Advanced Computational Assignment for 8000-Level Medical Bioinformatics
+## Advanced Medical Bioinformatics Assignment
 
-### Course Information
-- **Course**: Medical Bioinformatics (8000-level)
-- **Assignment Type**: Computational Lab Assignment
-- **Duration**: 3-4 weeks
-- **Prerequisites**: Basic Linux commands, understanding of genomic file formats, familiarity with high-performance computing
+### Course: Medical Bioinformatics (8000-level)
+### Duration: 4 weeks
+### Total Points: 100
 
 ---
 
-## Learning Objectives
+## **Overview**
 
-By the end of this assignment, students will be able to:
+This comprehensive assignment integrates three fundamental bioinformatics skill sets into a unified pipeline for analyzing human genomic data. You will work with high-performance computing environments, process large-scale genomic datasets, extract genomic features, and perform comparative sequence alignment analyses. This assignment mirrors real-world computational genomics workflows used in medical research and precision medicine applications.
 
-1. **Navigate and utilize high-performance computing environments** for genomic data analysis
-2. **Process and analyze large-scale human genome datasets** using command-line tools
-3. **Extract and manipulate genomic coordinates** from standard annotation files (GTF/GFF)
-4. **Compare and evaluate different sequence alignment algorithms** (BLAST vs. Smith-Waterman)
-5. **Integrate multiple bioinformatics workflows** into a comprehensive analysis pipeline
-6. **Interpret and visualize genomic analysis results** using statistical methods
-7. **Apply computational genomics techniques** to real-world medical genetics problems
+## **Learning Objectives**
 
----
+By completing this assignment, you will:
 
-## Assignment Overview
-
-This integrated assignment combines three fundamental bioinformatics skill sets essential for medical genomics research:
-
-### **Module 1**: High-Performance Computing with Human Genome Data
-### **Module 2**: Genomic Coordinate Extraction and Manipulation  
-### **Module 3**: Comparative Sequence Alignment Analysis
-
-Students will work with real human genomic datasets to build a comprehensive analysis pipeline that demonstrates proficiency in computational genomics workflows commonly used in medical research and clinical bioinformatics.
+* Master high-performance computing environments for genomic data processing
+* Develop proficiency in handling large-scale genomic datasets and file formats
+* Apply command-line tools for genomic feature extraction and coordinate manipulation
+* Compare and evaluate different sequence alignment algorithms
+* Integrate multiple bioinformatics tools into a cohesive analytical pipeline
+* Interpret results in the context of medical genomics and precision medicine
 
 ---
 
-## Prerequisites and Setup
+## **Module 1: High-Performance Computing with Human Genome Data (25 points)**
 
-### Required Knowledge
-- Basic understanding of Linux commands
-- Familiarity with FASTA and GTF file formats
-- Understanding of sequence alignment concepts
-- Basic knowledge of genomic coordinate systems
+### **Objectives**
+* Access and configure HPC resources for genomic analysis
+* Download and process large genomic datasets
+* Implement efficient file management strategies for big data
 
-### Computing Resources
-- Access to Palmetto2 cluster (or equivalent HPC environment)
-- Minimum 4 cores, 32GB memory allocation
-- 12-hour job duration capability
+### **Instructions**
 
-### Required Software
-- BLAST+ suite
-- EMBOSS package (water, needle)
-- Python 3.9+
-- Conda/Anaconda environment management
-- Standard Unix utilities (awk, grep, sed)
-
----
-
-## Module 1: High-Performance Computing with Human Genome Data
-
-### Objectives
-- Access and configure high-performance computing resources
-- Download and manage large genomic datasets
-- Understand file compression and storage optimization
-- Perform basic genomic data quality assessment
-
-### Tasks
-
-#### Task 1.1: Environment Setup
+#### **Step 1: HPC Environment Setup**
 ```bash
 # Access Palmetto2 cluster via OnDemand interface
-# Configure Jupyter session with appropriate resources
-# Set up working directory structure
+# Navigate to: https://ondemand.rcd.clemson.edu/
+
+# Request interactive session with:
+# - 8 CPU cores
+# - 64 GB memory  
+# - 24-hour walltime
+# - Appropriate partition for genomic analysis
 ```
 
-#### Task 1.2: Data Acquisition
+#### **Step 2: Workspace Configuration**
+```bash
+# Navigate to scratch space
+cd /scratch/$USER
+
+# Create project directory structure
+mkdir -p human_genome_pipeline/{data,results,scripts,logs}
+cd human_genome_pipeline
+
+# Set up environment variables
+export GENOME_DIR=$PWD/data
+export RESULTS_DIR=$PWD/results
+export SCRIPTS_DIR=$PWD/scripts
+```
+
+#### **Step 3: Genomic Data Acquisition**
 ```bash
 # Download human genome reference (GRCh38)
+cd $GENOME_DIR
+wget https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+
 # Download human cDNA sequences
-# Download GTF annotation files
-# Verify data integrity and format
+wget https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+
+# Download GTF annotation file
+wget https://ftp.ensembl.org/pub/release-109/gtf/homo_sapiens/Homo_sapiens.GRCh38.109.gtf.gz
+
+# Verify downloads and check file integrity
+ls -lh *.gz
+md5sum *.gz > download_checksums.txt
 ```
 
-#### Task 1.3: Data Management
+#### **Step 4: Data Processing and Quality Assessment**
 ```bash
-# Implement proper file organization
-# Apply compression/decompression strategies
-# Calculate storage requirements and optimization
+# Decompress files efficiently
+parallel gunzip ::: *.gz
+
+# Generate comprehensive dataset statistics
+echo "=== GENOME ASSEMBLY STATISTICS ===" > $RESULTS_DIR/dataset_summary.txt
+echo "Genome file: $(basename $GENOME_DIR/*.fa)" >> $RESULTS_DIR/dataset_summary.txt
+echo "Number of chromosomes/contigs: $(grep -c '^>' $GENOME_DIR/*.fa)" >> $RESULTS_DIR/dataset_summary.txt
+echo "Total genome size: $(grep -v '^>' $GENOME_DIR/*.fa | wc -c) bp" >> $RESULTS_DIR/dataset_summary.txt
+
+echo -e "\n=== cDNA STATISTICS ===" >> $RESULTS_DIR/dataset_summary.txt
+echo "Number of cDNA sequences: $(grep -c '^>' $GENOME_DIR/*cdna*.fa)" >> $RESULTS_DIR/dataset_summary.txt
+
+# Calculate N50 and other assembly metrics
+seqkit stats $GENOME_DIR/*.fa >> $RESULTS_DIR/assembly_metrics.txt
 ```
 
-### Deliverables for Module 1
-- Screenshot of successful HPC environment setup
-- Directory structure documentation
-- File size and compression analysis report
-- Basic genome statistics (chromosome count, total bases, etc.)
+### **Deliverables for Module 1:**
+1. Screenshot of successful HPC session allocation
+2. Complete dataset summary report
+3. File size comparison (compressed vs. uncompressed)
+4. Resource utilization log
 
 ---
 
-## Module 2: Genomic Coordinate Extraction and Manipulation
+## **Module 2: Genomic Feature Extraction and Coordinate Analysis (30 points)**
 
-### Objectives
-- Parse and extract information from GTF annotation files
-- Understand genomic coordinate systems (0-based vs 1-based)
-- Convert between different genome assemblies
-- Generate custom genomic interval files
+### **Objectives**
+* Parse GTF files to extract genomic coordinates
+* Manipulate genomic intervals and coordinate systems
+* Generate feature-specific datasets for downstream analysis
 
-### Tasks
+### **Instructions**
 
-#### Task 2.1: GTF File Analysis
+#### **Step 1: GTF File Analysis**
 ```bash
-# Parse GTF file structure
-# Extract exon coordinates for specific genes
-# Generate gene-level coordinate summaries
-# Create custom annotation subsets
+cd $GENOME_DIR
+
+# Examine GTF structure and content
+head -20 Homo_sapiens.GRCh38.109.gtf
+grep -v '^#' Homo_sapiens.GRCh38.109.gtf | cut -f3 | sort | uniq -c
+
+# Extract comprehensive exon coordinates
+awk '$3 == "exon" {print $1"\t"$4"\t"$5"\t"$7"\t"$9}' Homo_sapiens.GRCh38.109.gtf > $RESULTS_DIR/human_exons_detailed.bed
+
+# Add header to BED file
+echo -e "chromosome\tstart\tend\tstrand\tattributes" | cat - $RESULTS_DIR/human_exons_detailed.bed > temp && mv temp $RESULTS_DIR/human_exons_detailed.bed
 ```
 
-#### Task 2.2: Coordinate System Conversion
+#### **Step 2: Advanced Coordinate Manipulation**
 ```bash
-# Convert between 0-based and 1-based coordinates
-# Handle coordinate system differences between tools
-# Validate coordinate accuracy
+# Extract gene coordinates with metadata
+awk '$3 == "gene" {
+    match($9, /gene_id "([^"]+)"/, gene_id);
+    match($9, /gene_name "([^"]+)"/, gene_name);
+    match($9, /gene_biotype "([^"]+)"/, biotype);
+    print $1"\t"$4"\t"$5"\t"gene_id[1]"\t"gene_name[1]"\t"biotype[1]"\t"$7
+}' Homo_sapiens.GRCh38.109.gtf > $RESULTS_DIR/human_genes_annotated.bed
+
+# Calculate feature statistics per chromosome
+awk '$3 == "exon" {exons[$1]++} 
+     $3 == "gene" {genes[$1]++} 
+     END {
+         print "Chromosome\tGenes\tExons\tExons_per_Gene"
+         for (chr in genes) {
+             printf "%s\t%d\t%d\t%.2f\n", chr, genes[chr], exons[chr], exons[chr]/genes[chr]
+         }
+     }' Homo_sapiens.GRCh38.109.gtf | sort -k1,1V > $RESULTS_DIR/chromosome_feature_stats.txt
 ```
 
-#### Task 2.3: Custom Interval Generation
+#### **Step 3: Specialized Feature Extraction**
 ```bash
-# Create BED files from GTF annotations
-# Generate gene-specific coordinate files
-# Produce summary statistics for genomic features
+# Extract protein-coding genes only
+awk '$3 == "gene" && $9 ~ /gene_biotype "protein_coding"/ {
+    match($9, /gene_id "([^"]+)"/, gene_id);
+    match($9, /gene_name "([^"]+)"/, gene_name);
+    print $1"\t"$4"\t"$5"\t"gene_id[1]"\t"gene_name[1]"\t"$7
+}' Homo_sapiens.GRCh38.109.gtf > $RESULTS_DIR/protein_coding_genes.bed
+
+# Calculate gene length distribution
+awk '$3 == "gene" {
+    length = $5 - $4 + 1;
+    lengths[NR] = length;
+    sum += length;
+    if (length > max) max = length;
+    if (length < min || min == 0) min = length;
+}
+END {
+    n = asort(lengths);
+    median = (n % 2) ? lengths[(n+1)/2] : (lengths[n/2] + lengths[n/2+1])/2;
+    printf "Gene Length Statistics:\n";
+    printf "Total genes: %d\n", n;
+    printf "Mean length: %.0f bp\n", sum/n;
+    printf "Median length: %.0f bp\n", median;
+    printf "Min length: %d bp\n", min;
+    printf "Max length: %d bp\n", max;
+}' Homo_sapiens.GRCh38.109.gtf > $RESULTS_DIR/gene_length_statistics.txt
 ```
 
-### Deliverables for Module 2
-- Extracted exon coordinate files for 10 selected genes
-- Coordinate conversion validation report
-- Custom BED files for downstream analysis
-- Statistical summary of genomic feature distributions
+### **Deliverables for Module 2:**
+1. Annotated BED files for exons and genes
+2. Chromosome-wise feature statistics
+3. Gene length distribution analysis
+4. Protein-coding gene subset
 
 ---
 
-## Module 3: Comparative Sequence Alignment Analysis
+## **Module 3: Comparative Sequence Alignment Analysis (35 points)**
 
-### Objectives
-- Implement and compare different sequence alignment algorithms
-- Analyze alignment performance and accuracy trade-offs
-- Interpret alignment statistics and significance measures
-- Optimize alignment parameters for different use cases
+### **Objectives**
+* Implement and compare BLAST and Smith-Waterman algorithms
+* Analyze alignment sensitivity and specificity
+* Evaluate computational performance trade-offs
 
-### Tasks
+### **Instructions**
 
-#### Task 3.1: BLAST Analysis
+#### **Step 1: Alignment Tool Installation and Setup**
 ```bash
-# Create BLAST databases from genome sequences
-# Perform nucleotide BLAST searches
-# Analyze E-values and alignment statistics
-# Generate alignment result summaries
+cd $SCRIPTS_DIR
+
+# Install BLAST+ suite
+wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.14.0+-x64-linux.tar.gz
+tar -xzf ncbi-blast-2.14.0+-x64-linux.tar.gz
+export PATH=$PWD/ncbi-blast-2.14.0+/bin:$PATH
+
+# Install EMBOSS for Smith-Waterman
+module load emboss  # or install locally if needed
+
+# Verify installations
+blastn -version
+water -help
 ```
 
-#### Task 3.2: Smith-Waterman Analysis
+#### **Step 2: Database Preparation**
 ```bash
-# Implement Smith-Waterman local alignment
-# Compare results with BLAST alignments
-# Analyze computational performance differences
-# Evaluate alignment sensitivity and specificity
+# Create BLAST database from genome
+makeblastdb -in $GENOME_DIR/Homo_sapiens.GRCh38.dna.primary_assembly.fa \
+            -dbtype nucl \
+            -out $RESULTS_DIR/human_genome_db \
+            -title "Human Genome GRCh38"
+
+# Extract subset of cDNA sequences for testing (first 100 sequences)
+head -200 $GENOME_DIR/Homo_sapiens.GRCh38.cdna.all.fa > $RESULTS_DIR/test_cdna_subset.fa
+
+# Create smaller test datasets for Smith-Waterman
+seqkit sample -n 10 $RESULTS_DIR/test_cdna_subset.fa > $RESULTS_DIR/sw_test_sequences.fa
 ```
 
-#### Task 3.3: Comparative Analysis
+#### **Step 3: BLAST Analysis**
 ```bash
-# Statistical comparison of alignment methods
-# Performance benchmarking (time and memory)
-# Accuracy assessment using known sequences
-# Parameter optimization analysis
+# Run BLAST alignment with detailed output
+blastn -query $RESULTS_DIR/test_cdna_subset.fa \
+       -db $RESULTS_DIR/human_genome_db \
+       -out $RESULTS_DIR/blast_results.txt \
+       -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" \
+       -max_target_seqs 5 \
+       -num_threads 8
+
+# Generate BLAST statistics
+echo "BLAST Alignment Results Summary:" > $RESULTS_DIR/blast_summary.txt
+echo "Total alignments: $(wc -l < $RESULTS_DIR/blast_results.txt)" >> $RESULTS_DIR/blast_summary.txt
+echo "Average percent identity: $(awk '{sum+=$3; count++} END {print sum/count}' $RESULTS_DIR/blast_results.txt)" >> $RESULTS_DIR/blast_summary.txt
+echo "Average alignment length: $(awk '{sum+=$4; count++} END {print sum/count}' $RESULTS_DIR/blast_results.txt)" >> $RESULTS_DIR/blast_summary.txt
 ```
 
-### Deliverables for Module 3
-- BLAST alignment results and statistics
-- Smith-Waterman alignment outputs
-- Comparative analysis report with visualizations
-- Performance benchmarking data
-- Parameter optimization recommendations
+#### **Step 4: Smith-Waterman Analysis**
+```bash
+# Run Smith-Waterman alignments for comparison
+mkdir -p $RESULTS_DIR/smith_waterman
+
+# Extract individual sequences for pairwise alignment
+seqkit split -i $RESULTS_DIR/sw_test_sequences.fa -O $RESULTS_DIR/smith_waterman/
+
+# Run Smith-Waterman alignments
+for seq_file in $RESULTS_DIR/smith_waterman/*.fa; do
+    base_name=$(basename $seq_file .fa)
+    water -asequence $seq_file \
+          -bsequence $GENOME_DIR/Homo_sapiens.GRCh38.dna.primary_assembly.fa \
+          -gapopen 10 \
+          -gapextend 0.5 \
+          -outfile $RESULTS_DIR/smith_waterman/${base_name}_sw.txt \
+          -aformat pair
+done
+```
+
+#### **Step 5: Comparative Analysis**
+```bash
+# Create comprehensive comparison script
+cat > $SCRIPTS_DIR/alignment_comparison.py << 'EOF'
+#!/usr/bin/env python3
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from pathlib import Path
+import time
+
+def parse_blast_results(blast_file):
+    """Parse BLAST output file"""
+    columns = ['qseqid', 'sseqid', 'pident', 'length', 'mismatch', 
+               'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore']
+    df = pd.read_csv(blast_file, sep='\t', names=columns)
+    return df
+
+def analyze_alignment_performance():
+    """Compare BLAST and Smith-Waterman performance"""
+    results_dir = Path('../results')
+    
+    # Load BLAST results
+    blast_df = parse_blast_results(results_dir / 'blast_results.txt')
+    
+    # Generate performance comparison plots
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    
+    # Plot 1: Percent Identity Distribution
+    axes[0,0].hist(blast_df['pident'], bins=30, alpha=0.7, edgecolor='black')
+    axes[0,0].set_xlabel('Percent Identity (%)')
+    axes[0,0].set_ylabel('Frequency')
+    axes[0,0].set_title('BLAST Percent Identity Distribution')
+    
+    # Plot 2: Alignment Length vs E-value
+    axes[0,1].scatter(blast_df['length'], -np.log10(blast_df['evalue']), alpha=0.6)
+    axes[0,1].set_xlabel('Alignment Length (bp)')
+    axes[0,1].set_ylabel('-log10(E-value)')
+    axes[0,1].set_title('Alignment Length vs Statistical Significance')
+    
+    # Plot 3: E-value distribution
+    axes[1,0].hist(np.log10(blast_df['evalue']), bins=30, alpha=0.7, edgecolor='black')
+    axes[1,0].set_xlabel('log10(E-value)')
+    axes[1,0].set_ylabel('Frequency')
+    axes[1,0].set_title('E-value Distribution')
+    
+    # Plot 4: Bit Score vs Percent Identity
+    axes[1,1].scatter(blast_df['pident'], blast_df['bitscore'], alpha=0.6)
+    axes[1,1].set_xlabel('Percent Identity (%)')
+    axes[1,1].set_ylabel('Bit Score')
+    axes[1,1].set_title('Bit Score vs Percent Identity')
+    
+    plt.tight_layout()
+    plt.savefig(results_dir / 'alignment_analysis.png', dpi=300, bbox_inches='tight')
+    
+    # Generate summary statistics
+    summary_stats = {
+        'Total_Alignments': len(blast_df),
+        'Mean_Percent_Identity': blast_df['pident'].mean(),
+        'Median_Percent_Identity': blast_df['pident'].median(),
+        'Mean_Alignment_Length': blast_df['length'].mean(),
+        'High_Quality_Alignments': len(blast_df[blast_df['pident'] > 95]),
+        'Significant_Alignments': len(blast_df[blast_df['evalue'] < 1e-10])
+    }
+    
+    return summary_stats
+
+if __name__ == "__main__":
+    stats = analyze_alignment_performance()
+    print("Alignment Analysis Summary:")
+    for key, value in stats.items():
+        print(f"{key}: {value:.2f}" if isinstance(value, float) else f"{key}: {value}")
+EOF
+
+# Run the analysis
+cd $SCRIPTS_DIR
+python3 alignment_comparison.py > $RESULTS_DIR/alignment_comparison_summary.txt
+```
+
+### **Deliverables for Module 3:**
+1. BLAST and Smith-Waterman alignment results
+2. Performance comparison analysis
+3. Statistical significance evaluation
+4. Computational efficiency assessment
 
 ---
 
-## Integrated Analysis Pipeline
+## **Module 4: Integrated Pipeline and Medical Applications (10 points)**
 
-### Final Integration Task
-Students must combine all three modules into a comprehensive analysis pipeline that:
+### **Objectives**
+* Integrate all modules into a cohesive analysis pipeline
+* Apply results to medical genomics contexts
+* Develop reproducible workflows
 
-1. **Processes a novel genomic dataset** using HPC resources
-2. **Extracts relevant genomic coordinates** for target regions
-3. **Performs comparative sequence alignment** analysis
-4. **Generates integrated results** with statistical validation
-5. **Produces publication-quality visualizations** and reports
+### **Instructions**
 
-### Pipeline Components
+#### **Step 1: Pipeline Integration**
 ```bash
+# Create master pipeline script
+cat > $SCRIPTS_DIR/integrated_pipeline.sh << 'EOF'
 #!/bin/bash
-# Integrated Human Genome Analysis Pipeline
-# Student: [Name]
-# Date: [Date]
+set -e
 
-# Module 1: Data Setup and Management
-setup_environment()
-download_genome_data()
-organize_file_structure()
+echo "Starting Integrated Human Genome Analysis Pipeline..."
+echo "Timestamp: $(date)"
 
-# Module 2: Coordinate Extraction
-parse_gtf_annotations()
-extract_target_coordinates()
-generate_interval_files()
+# Module 1: Data acquisition and processing
+echo "=== MODULE 1: Data Processing ==="
+bash module1_data_processing.sh
 
-# Module 3: Sequence Alignment
-create_blast_database()
-perform_blast_analysis()
-run_smith_waterman()
-compare_alignment_methods()
+# Module 2: Feature extraction
+echo "=== MODULE 2: Feature Extraction ==="
+bash module2_feature_extraction.sh
 
-# Integration and Reporting
-generate_summary_statistics()
-create_visualizations()
-compile_final_report()
+# Module 3: Sequence alignment
+echo "=== MODULE 3: Alignment Analysis ==="
+bash module3_alignment_analysis.sh
+
+# Generate final report
+echo "=== GENERATING FINAL REPORT ==="
+python3 generate_final_report.py
+
+echo "Pipeline completed successfully!"
+echo "Results available in: $RESULTS_DIR"
+EOF
+
+chmod +x $SCRIPTS_DIR/integrated_pipeline.sh
+```
+
+#### **Step 2: Medical Genomics Application**
+Create a focused analysis on clinically relevant genes:
+
+```bash
+# Extract clinically relevant gene sets
+grep -E "(BRCA1|BRCA2|TP53|EGFR|KRAS|PIK3CA|APC|MLH1|MSH2|MSH6)" \
+     $RESULTS_DIR/protein_coding_genes.bed > $RESULTS_DIR/clinical_genes.bed
+
+# Analyze these genes specifically
+awk 'NR>1 {print $4}' $RESULTS_DIR/clinical_genes.bed | \
+while read gene_id; do
+    grep "$gene_id" $RESULTS_DIR/human_exons_detailed.bed | wc -l
+done > $RESULTS_DIR/clinical_gene_exon_counts.txt
 ```
 
 ---
 
-## Assessment Criteria
+## **Assessment and Deliverables**
 
-### Technical Proficiency (40%)
-- Correct implementation of bioinformatics workflows
-- Proper use of command-line tools and parameters
-- Efficient resource utilization on HPC systems
-- Code quality and documentation
+### **Final Submission Requirements:**
 
-### Scientific Analysis (35%)
-- Accuracy of genomic coordinate extraction
-- Appropriate interpretation of alignment results
-- Statistical analysis of comparative data
-- Quality of scientific reasoning
+1. **Technical Implementation (40%)**
+   - Complete, executable scripts for all modules
+   - Proper error handling and logging
+   - Efficient resource utilization documentation
 
-### Communication (25%)
-- Clarity of written reports and documentation
-- Quality of data visualizations
-- Presentation of integrated results
-- Discussion of biological significance
+2. **Scientific Analysis (35%)**
+   - Comprehensive results interpretation
+   - Statistical analysis of alignment performance
+   - Medical relevance discussion
 
----
+3. **Documentation and Reproducibility (25%)**
+   - Detailed README with pipeline instructions
+   - Well-commented code
+   - Complete results summary report
 
-## Submission Requirements
+### **Submission Format:**
+Submit a compressed archive containing:
+- All scripts and configuration files
+- Results directory with all output files
+- Comprehensive analysis report (PDF)
+- README with execution instructions
 
-### Required Files
-1. **Complete analysis pipeline script** (bash/Python)
-2. **Module-specific result files** (alignments, coordinates, statistics)
-3. **Integrated analysis report** (PDF, 8-10 pages)
-4. **Data visualization portfolio** (figures and plots)
-5. **Reflection essay** (2 pages) on computational challenges and solutions
-
-### File Organization
-```
-StudentName_GenomeAnalysis/
-├── scripts/
-│   ├── pipeline_main.sh
-│   ├── module1_genome_processing.sh
-│   ├── module2_coordinate_extraction.sh
-│   └── module3_alignment_analysis.sh
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── results/
-├── figures/
-├── reports/
-│   ├── integrated_analysis_report.pdf
-│   └── reflection_essay.pdf
-└── README.md
-```
-
----
-
-## Timeline and Milestones
-
-### Week 1: Module 1 - HPC and Data Management
-- **Days 1-2**: Environment setup and data download
-- **Days 3-5**: Data processing and quality assessment
-- **Weekend**: Module 1 deliverables preparation
-
-### Week 2: Module 2 - Coordinate Extraction
-- **Days 1-3**: GTF parsing and coordinate extraction
-- **Days 4-5**: Coordinate system conversion and validation
-- **Weekend**: Module 2 deliverables preparation
-
-### Week 3: Module 3 - Sequence Alignment
-- **Days 1-2**: BLAST analysis implementation
-- **Days 3-4**: Smith-Waterman analysis
-- **Day 5**: Comparative analysis
-- **Weekend**: Module 3 deliverables preparation
-
-### Week 4: Integration and Reporting
-- **Days 1-3**: Pipeline integration and testing
-- **Days 4-5**: Report writing and visualization
-- **Weekend**: Final submission preparation
-
----
-
-## Advanced Extensions (Optional)
-
-For students seeking additional challenges:
-
-### Extension 1: Multi-Species Comparative Analysis
-- Extend pipeline to include multiple species genomes
-- Perform phylogenetic analysis of alignment results
-- Investigate evolutionary conservation patterns
-
-### Extension 2: Clinical Variant Analysis
-- Integrate variant calling from sequencing data
-- Annotate variants using extracted coordinate information
-- Assess clinical significance of identified variants
-
-### Extension 3: Performance Optimization
-- Implement parallel processing strategies
-- Optimize memory usage for large datasets
-- Develop scalable solutions for genome-wide analysis
-
----
-
-## Resources and References
-
-### Primary Resources
-- [NCBI BLAST+ Documentation](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs)
-- [EMBOSS User Guide](http://emboss.sourceforge.net/docs/)
-- [Ensembl Genome Browser](https://www.ensembl.org/)
-- [UCSC Genome Browser](https://genome.ucsc.edu/)
-
-### Recommended Reading
-1. Durbin, R. et al. (1998). *Biological Sequence Analysis*. Cambridge University Press.
-2. Mount, D.W. (2004). *Bioinformatics: Sequence and Genome Analysis*. Cold Spring Harbor Laboratory Press.
-3. Pevzner, P. (2000). *Computational Molecular Biology: An Algorithmic Approach*. MIT Press.
-
-### Online Tutorials
-- [Galaxy Training Materials](https://training.galaxyproject.org/)
-- [Bioinformatics Workbook](https://bioinformaticsworkbook.org/)
-- [EMBL-EBI Training](https://www.ebi.ac.uk/training/)
-
----
-
-## Troubleshooting and Support
-
-### Common Issues and Solutions
-
-#### HPC Access Problems
-- Verify VPN connection and authentication
-- Check resource allocation and queue status
-- Contact system administrators for technical issues
-
-#### Data Download Failures
-- Implement retry mechanisms for large file downloads
-- Verify network connectivity and storage space
-- Use alternative download mirrors when available
-
-#### Alignment Performance Issues
-- Optimize parameters for dataset size
-- Implement data subsetting for testing
-- Consider alternative alignment strategies
-
-### Getting Help
-- **Office Hours**: [Schedule with instructor]
-- **Discussion Forum**: [Course management system]
-- **Peer Collaboration**: Encouraged for troubleshooting (not for copying)
-
----
-
-## Academic Integrity
-
-This assignment requires individual work. While collaboration on troubleshooting technical issues is encouraged, all analysis, code, and written work must be original. Proper citation is required for any external resources, tools, or methodologies used beyond those provided in the course materials.
-
-### Collaboration Guidelines
-- **Allowed**: Discussing general approaches and troubleshooting technical issues
-- **Not Allowed**: Sharing code, data files, or written analysis
-- **Required**: Proper attribution of all external resources and tools
-
----
-
-## Grading Rubric
+### **Evaluation Rubric:**
 
 | Component | Excellent (A) | Good (B) | Satisfactory (C) | Needs Improvement (D/F) |
 |-----------|---------------|----------|------------------|-------------------------|
-| **Technical Implementation** | All modules work flawlessly, efficient code, proper error handling | Minor technical issues, mostly functional, good practices | Basic functionality achieved, some inefficiencies | Major technical problems, incomplete implementation |
-| **Scientific Analysis** | Sophisticated analysis, accurate interpretations, insightful conclusions | Good analysis with minor gaps, mostly accurate interpretations | Basic analysis completed, some interpretation errors | Inadequate analysis, significant errors in interpretation |
-| **Integration and Synthesis** | Seamless integration of all modules, comprehensive pipeline | Good integration with minor gaps, functional pipeline | Basic integration achieved, some disconnected components | Poor integration, fragmented approach |
-| **Communication** | Clear, professional writing, excellent visualizations, compelling presentation | Good writing and visuals, minor clarity issues | Adequate communication, basic visualizations | Poor communication, unclear presentation |
-| **Innovation and Depth** | Goes beyond requirements, demonstrates deep understanding, creative solutions | Shows good understanding, some innovative approaches | Meets basic requirements, standard approaches | Minimal effort, superficial understanding |
+| **HPC Usage** | Optimal resource allocation, efficient processing | Good resource usage, minor inefficiencies | Basic functionality, some resource waste | Poor resource management |
+| **Data Processing** | Complete, accurate processing with validation | Mostly complete with minor issues | Basic processing completed | Incomplete or incorrect processing |
+| **Feature Extraction** | Comprehensive extraction with advanced analysis | Good extraction with basic analysis | Basic extraction completed | Incomplete or incorrect extraction |
+| **Alignment Analysis** | Thorough comparison with statistical analysis | Good comparison with basic statistics | Basic comparison completed | Incomplete or superficial analysis |
+| **Integration** | Seamless pipeline with error handling | Good integration with minor issues | Basic pipeline functionality | Poor or non-functional integration |
+| **Documentation** | Comprehensive, clear, reproducible | Good documentation with minor gaps | Basic documentation | Poor or missing documentation |
 
 ---
 
-## Learning Assessment Questions
+## **Advanced Extensions (Extra Credit)**
 
-To guide your analysis and ensure comprehensive understanding, consider these questions throughout the assignment:
+1. **Variant Analysis Integration** (+10 points)
+   - Incorporate VCF file processing
+   - Analyze SNPs in extracted genomic regions
 
-### Module 1 Questions
-1. How do file compression strategies affect computational performance in genomic analysis?
-2. What are the trade-offs between local storage and network-based data access in HPC environments?
-3. How does data organization impact the efficiency of downstream analysis pipelines?
+2. **Phylogenetic Analysis** (+10 points)
+   - Compare human sequences with other species
+   - Build phylogenetic trees for gene families
 
-### Module 2 Questions
-1. Why are coordinate system differences critical in genomic analysis, and how can errors be prevented?
-2. What are the advantages and limitations of different genomic annotation formats?
-3. How do genome assembly versions affect coordinate-based analyses?
+3. **Machine Learning Application** (+15 points)
+   - Develop predictive models for sequence classification
+   - Implement feature selection algorithms
 
-### Module 3 Questions
-1. Under what circumstances would you choose BLAST over Smith-Waterman, and vice versa?
-2. How do alignment parameters affect sensitivity and specificity in sequence searches?
-3. What statistical measures are most appropriate for evaluating alignment significance?
-
-### Integration Questions
-1. How do the three modules complement each other in a comprehensive genomic analysis workflow?
-2. What are the computational bottlenecks in genome-scale analysis, and how can they be addressed?
-3. How would you adapt this pipeline for clinical genomics applications?
+4. **Cloud Computing Implementation** (+10 points)
+   - Adapt pipeline for AWS/Google Cloud
+   - Implement containerization with Docker
 
 ---
 
-*This assignment is designed to provide hands-on experience with the computational tools and analytical approaches essential for modern medical bioinformatics research. Success requires not only technical proficiency but also scientific reasoning and clear communication of complex genomic analyses.*
+## **Resources and References**
+
+### **Primary Resources:**
+- [ENSEMBL Database](https://www.ensembl.org/)
+- [NCBI BLAST Documentation](https://www.ncbi.nlm.nih.gov/books/NBK279690/)
+- [EMBOSS Documentation](http://emboss.sourceforge.net/docs/)
+- [Palmetto2 User Guide](https://docs.rcd.clemson.edu/palmetto/)
+
+### **Recommended Reading:**
+- Bioinformatics Data Skills by Vince Buffalo
+- Biological Sequence Analysis by Durbin et al.
+- Computational Genomics with R by Altuna Akalin
+
+### **Support Resources:**
+- Office hours: [Schedule TBD]
+- Discussion forum: [Canvas Discussion Board]
+- HPC support: [Clemson RCD Help Desk]
+
+---
+
+## **Timeline and Milestones**
+
+| Week | Module | Key Deliverables | Due Date |
+|------|--------|------------------|----------|
+| 1 | Module 1 | HPC setup, data download, basic processing | End of Week 1 |
+| 2 | Module 2 | Feature extraction, coordinate analysis | End of Week 2 |
+| 3 | Module 3 | Alignment analysis, performance comparison | End of Week 3 |
+| 4 | Module 4 | Pipeline integration, final report | End of Week 4 |
+
+**Final Submission Deadline:** [Insert specific date]
+
+---
+
+*This assignment is designed to provide hands-on experience with real-world computational genomics workflows. Success requires careful attention to detail, systematic approach to problem-solving, and integration of multiple bioinformatics concepts and tools.*
