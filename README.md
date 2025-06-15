@@ -23,7 +23,7 @@ By completing this assignment, you will:
 
 ---
 
-## **Module 1: High-Performance Computing with Human Genome Data (25 points)**
+## **Part 1: High-Performance Computing with Human Genome Data (25 points)**
 
 ### **Objectives**
 * Access and configure HPC resources for genomic analysis
@@ -94,7 +94,7 @@ echo "Number of cDNA sequences: $(grep -c '^>' $GENOME_DIR/*cdna*.fa)" >> $RESUL
 seqkit stats $GENOME_DIR/*.fa >> $RESULTS_DIR/assembly_metrics.txt
 ```
 
-### **Deliverables for Module 1:**
+### **Deliverables for Part 1:**
 1. Screenshot of successful HPC session allocation
 2. Complete dataset summary report
 3. File size comparison (compressed vs. uncompressed)
@@ -102,7 +102,7 @@ seqkit stats $GENOME_DIR/*.fa >> $RESULTS_DIR/assembly_metrics.txt
 
 ---
 
-## **Module 2: Genomic Feature Extraction and Coordinate Analysis (30 points)**
+## **Part 2: Genomic Feature Extraction and Coordinate Analysis (30 points)**
 
 ### **Objectives**
 * Parse GTF files to extract genomic coordinates
@@ -184,7 +184,7 @@ END {
 
 ---
 
-## **Module 3: Comparative Sequence Alignment Analysis (35 points)**
+## **Part 3: Comparative Sequence Alignment Analysis (35 points)**
 
 ### **Objectives**
 * Implement and compare BLAST and Smith-Waterman algorithms
@@ -342,7 +342,7 @@ cd $SCRIPTS_DIR
 python3 alignment_comparison.py > $RESULTS_DIR/alignment_comparison_summary.txt
 ```
 
-### **Deliverables for Module 3:**
+### **Deliverables for Part 3:**
 1. BLAST and Smith-Waterman alignment results
 2. Performance comparison analysis
 3. Statistical significance evaluation
@@ -350,7 +350,7 @@ python3 alignment_comparison.py > $RESULTS_DIR/alignment_comparison_summary.txt
 
 ---
 
-## **Module 4: Integrated Pipeline and Medical Applications (10 points)**
+## **Part 4: Integrated Pipeline and Medical Applications (10 points)**
 
 ### **Objectives**
 * Integrate all modules into a cohesive analysis pipeline
@@ -428,43 +428,14 @@ done > $RESULTS_DIR/clinical_gene_exon_counts.txt
    - Well-commented code
    - Complete results summary report
 
-### **Submission Format:**
-Submit a compressed archive containing:
+### **Submission Instructions:**
+* Submit your Parts 1-4 deliverables files through Canvas in a single double compressed (tar + gzip = tarball). Please put each Part in a seperate directory.  Include:
 - All scripts and configuration files
 - Results directory with all output files
 - Comprehensive analysis report (PDF)
 - README with execution instructions
-
-### **Evaluation Rubric:**
-
-| Component | Excellent (A) | Good (B) | Satisfactory (C) | Needs Improvement (D/F) |
-|-----------|---------------|----------|------------------|-------------------------|
-| **HPC Usage** | Optimal resource allocation, efficient processing | Good resource usage, minor inefficiencies | Basic functionality, some resource waste | Poor resource management |
-| **Data Processing** | Complete, accurate processing with validation | Mostly complete with minor issues | Basic processing completed | Incomplete or incorrect processing |
-| **Feature Extraction** | Comprehensive extraction with advanced analysis | Good extraction with basic analysis | Basic extraction completed | Incomplete or incorrect extraction |
-| **Alignment Analysis** | Thorough comparison with statistical analysis | Good comparison with basic statistics | Basic comparison completed | Incomplete or superficial analysis |
-| **Integration** | Seamless pipeline with error handling | Good integration with minor issues | Basic pipeline functionality | Poor or non-functional integration |
-| **Documentation** | Comprehensive, clear, reproducible | Good documentation with minor gaps | Basic documentation | Poor or missing documentation |
-
----
-
-## **Advanced Extensions (Extra Credit)**
-
-1. **Variant Analysis Integration** (+10 points)
-   - Incorporate VCF file processing
-   - Analyze SNPs in extracted genomic regions
-
-2. **Phylogenetic Analysis** (+10 points)
-   - Compare human sequences with other species
-   - Build phylogenetic trees for gene families
-
-3. **Machine Learning Application** (+15 points)
-   - Develop predictive models for sequence classification
-   - Implement feature selection algorithms
-
-4. **Cloud Computing Implementation** (+10 points)
-   - Adapt pipeline for AWS/Google Cloud
-   - Implement containerization with Docker
+* Due date: See syllabus
+* Late submissions will be subject to the policy in the syllabus.
 
 ---
 
@@ -476,28 +447,6 @@ Submit a compressed archive containing:
 - [EMBOSS Documentation](http://emboss.sourceforge.net/docs/)
 - [Palmetto2 User Guide](https://docs.rcd.clemson.edu/palmetto/)
 
-### **Recommended Reading:**
-- Bioinformatics Data Skills by Vince Buffalo
-- Biological Sequence Analysis by Durbin et al.
-- Computational Genomics with R by Altuna Akalin
-
-### **Support Resources:**
-- Office hours: [Schedule TBD]
-- Discussion forum: [Canvas Discussion Board]
-- HPC support: [Clemson RCD Help Desk]
-
----
-
-## **Timeline and Milestones**
-
-| Week | Module | Key Deliverables | Due Date |
-|------|--------|------------------|----------|
-| 1 | Module 1 | HPC setup, data download, basic processing | End of Week 1 |
-| 2 | Module 2 | Feature extraction, coordinate analysis | End of Week 2 |
-| 3 | Module 3 | Alignment analysis, performance comparison | End of Week 3 |
-| 4 | Module 4 | Pipeline integration, final report | End of Week 4 |
-
-**Final Submission Deadline:** [Insert specific date]
 
 ---
 
