@@ -8,7 +8,7 @@
 
 ## **Overview**
 
-This comprehensive assignment integrates three fundamental bioinformatics skill sets into a unified pipeline for analyzing human genomic data. You will work with high-performance computing environments, process large-scale genomic datasets, extract genomic features, and perform comparative sequence alignment analyses. This assignment mirrors real-world computational genomics workflows used in medical research and precision medicine applications.
+This comprehensive assignment integrates three fundamental bioinformatics skill sets you practiced in this module into a unified pipeline for analyzing human genomic data. You will work with high-performance computing environments, process large-scale genomic datasets, extract genomic features, and perform comparative sequence alignment analyses. This assignment mirrors real-world computational genomics workflows used in medical research and precision medicine applications.
 
 ## **Learning Objectives**
 
