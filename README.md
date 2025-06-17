@@ -431,8 +431,8 @@ done > $RESULTS_DIR/clinical_gene_exon_counts.txt
 - All scripts and configuration files
 - Results directory with all output files
 - Comprehensive analysis report (PDF)
-- README with execution instructions
-* Due date: See syllabus
+- README text file with execution instructions
+
 * Late submissions will be subject to the policy in the syllabus.
 
 ---
