@@ -173,8 +173,8 @@ END {
     printf "Max length: %d bp\n", max;
 }' Homo_sapiens.GRCh38.109.gtf > $RESULTS_DIR/gene_length_statistics.txt
 ```
-
-### **Deliverables for Module 2:**
+ 
+### **Deliverables for Part 2:**
 1. Annotated BED files for exons and genes
 2. Chromosome-wise feature statistics
 3. Gene length distribution analysis
@@ -404,7 +404,9 @@ while read gene_id; do
     grep "$gene_id" $RESULTS_DIR/human_exons_detailed.bed | wc -l
 done > $RESULTS_DIR/clinical_gene_exon_counts.txt
 ```
-
+### **Deliverables for Part 4:**
+1. Pipeline script as a plain text file.
+2. Clinically relevant disease genes results.
 ---
 
 ## **Assessment and Deliverables**
@@ -427,13 +429,8 @@ done > $RESULTS_DIR/clinical_gene_exon_counts.txt
    - Complete results summary report
 
 ### **Submission Instructions:**
-Submit your Parts 1-4 deliverables files through Canvas in a single double compressed (tar + gzip = tarball). Please put each Part in a seperate directory.  Include:
-    - Sub Item All scripts and configuration files
-    - Sub Item Results directory with all output files
-    - Sub Item Comprehensive analysis report (PDF)
-    - Sub Item README text file with execution instructions
-
-* Late submissions will be subject to the policy in the syllabus.
+1. **Submit your Parts 1-4 deliverables files through Canvas in a single double compressed (tar + gzip = tarball). Please put each Part in a seperate directory.  
+2 **Late submissions will be subject to the policy in the syllabus.
 
 ---
 
