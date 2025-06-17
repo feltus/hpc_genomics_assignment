@@ -429,8 +429,8 @@ done > $RESULTS_DIR/clinical_gene_exon_counts.txt
    - Complete results summary report
 
 ### **Submission Instructions:**
-1. **Submit your Parts 1-4 deliverables files through Canvas in a single double compressed (tar + gzip = tarball). Please put each Part in a seperate directory.  
-2 **Late submissions will be subject to the policy in the syllabus.
+1. Submit your Parts 1-4 deliverables files through Canvas in a single double compressed (tar + gzip = tarball). Please put each Part in a seperate directory.  
+2. Late submissions will be subject to the policy in the syllabus.
 
 ---
 
