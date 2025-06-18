@@ -21,7 +21,7 @@ By completing this assignment, you will:
 
 ---
 
-## **Part 1: High-Performance Computing with Human Genome Data (25 points)**
+## **Part 1: High-Performance Computing with Human Genome Data**
 
 ### **Objectives**
 * Access and configure HPC resources for genomic analysis
@@ -100,7 +100,7 @@ seqkit stats $GENOME_DIR/*.fa >> $RESULTS_DIR/assembly_metrics.txt
 
 ---
 
-## **Part 2: Genomic Feature Extraction and Coordinate Analysis (30 points)**
+## **Part 2: Genomic Feature Extraction and Coordinate Analysis**
 
 ### **Objectives**
 * Parse GTF files to extract genomic coordinates
@@ -182,7 +182,7 @@ END {
 
 ---
 
-## **Part 3: Comparative Sequence Alignment Analysis (35 points)**
+## **Part 3: Comparative Sequence Alignment Analysis**
 
 ### **Objectives**
 * Implement and compare BLAST and Smith-Waterman algorithms
@@ -348,7 +348,7 @@ python3 alignment_comparison.py > $RESULTS_DIR/alignment_comparison_summary.txt
 
 ---
 
-## **Part 4: Integrated Pipeline and Medical Applications (10 points)**
+## **Part 4: Integrated Pipeline and Medical Applications**
 
 ### **Objectives**
 * Integrate all modules into a cohesive analysis pipeline
@@ -431,18 +431,3 @@ done > $RESULTS_DIR/clinical_gene_exon_counts.txt
 ### **Submission Instructions:**
 1. Submit your Parts 1-4 deliverables files through Canvas in a single double compressed (tar + gzip = tarball). Please put each Part in a separate directory.  
 2. Late submissions will be subject to the policy in the syllabus.
-
----
-
-## **Resources and References**
-
-### **Primary Resources:**
-- [ENSEMBL Database](https://www.ensembl.org/)
-- [NCBI BLAST Documentation](https://www.ncbi.nlm.nih.gov/books/NBK279690/)
-- [EMBOSS Documentation](http://emboss.sourceforge.net/docs/)
-- [Palmetto2 User Guide](https://docs.rcd.clemson.edu/palmetto/)
-
-
----
-
-*This assignment is designed to provide hands-on experience with real-world computational genomics workflows. Success requires careful attention to detail, systematic approach to problem-solving, and integration of multiple bioinformatics concepts and tools.*
