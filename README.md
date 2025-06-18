@@ -1,5 +1,3 @@
-# hpc_genomics_assignment
-
 # Computational Assignment:  Integrated Human Genome Analysis Pipeline
 
 --
